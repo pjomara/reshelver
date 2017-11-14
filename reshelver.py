@@ -26,7 +26,10 @@ def main():
 
     user= userName()
     barcode= eval(input("Scan the barcode: "))
-    firstCall(barcode, user)
+    if barcode == 1:
+        stopScanning(barcode, user)
+    else:    
+        firstCall(barcode, user)
     
     while barcode != 1:
         barcode= eval(input("Scan the barcode: "))
@@ -34,7 +37,7 @@ def main():
         cleanCall = callCleanup(call)
         recorder(user, cleanCall, description)
     else:
-        sys.exit()
+        stopScanning(barcode, user)
 
 #Acquires user's name for log file.
 def userName():
@@ -54,7 +57,7 @@ def firstCall(barcode, user):
 def callRetriever(barcode):
     call= ''
     description= ''
-    conn= sqlite3.connect(r'T:\reShelver\gcCatalog.sqlite')
+    conn= sqlite3.connect('gcCatalog.sqlite')
     try:
         c = conn.cursor()
 
@@ -79,7 +82,7 @@ def callRetriever(barcode):
 #Records book's call number (including, if applicable, description),
 #user, and date/time stamp.
 def recorder(user, cleanCall, description):
-    record= open(r"T:\reShelver\reshelveLog.csv", "a")
+    record= open("reshelveLog.csv", "a")
     dateTime= datetime.datetime.now().replace(microsecond=0)
     format= "%a %b %d %H:%M:%S %Y"
     print(cleanCall,",",description, ",", user, ",",dateTime, file= record)
@@ -88,7 +91,8 @@ def recorder(user, cleanCall, description):
 #Removes extraneous characters from call number.
 def callCleanup(call):
     if call == None:
-        return ("Stopped scanning")
+        return ("Call not found")
+    
     else:
         call= call.rstrip()
         call= call.replace('0','',1)
@@ -101,6 +105,15 @@ def callCleanup(call):
             call= call.replace('!', ' ', 1)
         return call
 
+#Records "stopped scanning" message in log and quits script if user
+#enters 1 for barcode.
+def stopScanning(barcode, user):
+    record= open("reshelveLog.csv", "a")
+    dateTime= datetime.datetime.now().replace(microsecond=0)
+    format= "%a %b %d %H:%M:%S %Y"
+    print("Stopped scanning",","," ",",", user, ",",dateTime, file= record)
+    record.close()
+    sys.exit()
 main()
 
 
