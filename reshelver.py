@@ -25,33 +25,23 @@ import datetime
 def main():
 
     user= userName()
-    barcode= eval(input("Scan the barcode: "))
-    if barcode == 1:
-        stopScanning(barcode, user)
-    else:    
-        firstCall(barcode, user)
-    
+    barcode = 0
     while barcode != 1:
-        barcode= eval(input("Scan the barcode: "))
-        call, description = callRetriever(barcode)
-        cleanCall = callCleanup(call)
-        recorder(user, cleanCall, description)
+        barcode= eval(input("Scan a barcode: "))
+        if barcode == 1:
+                stopScanning(user)
+        else:
+            call, description = callRetriever(barcode)
+            cleanCall= callCleanup(call)
+            recorder(user, cleanCall, description)
     else:
-        stopScanning(barcode, user)
+        stopScanning(user)
+    
 
 #Acquires user's name for log file.
 def userName():
     user= input("Enter your first name and last initial. ")
     return user
-
-#Acquires, parses, and records first scanned barcode/book.
-def firstCall(barcode, user):
-    if barcode == 1:
-        sys.exit()
-    else:
-        call, description = callRetriever(barcode)
-        cleanCall = callCleanup(call)
-        recorder(user, cleanCall, description) 
 
 #Acquires, parses, and records subsequent scanned barcodes/books.
 def callRetriever(barcode):
@@ -107,7 +97,7 @@ def callCleanup(call):
 
 #Records "stopped scanning" message in log and quits script if user
 #enters 1 for barcode.
-def stopScanning(barcode, user):
+def stopScanning(user):
     record= open("reshelveLog.csv", "a")
     dateTime= datetime.datetime.now().replace(microsecond=0)
     format= "%a %b %d %H:%M:%S %Y"
@@ -115,7 +105,3 @@ def stopScanning(barcode, user):
     record.close()
     sys.exit()
 main()
-
-
-                
-                
